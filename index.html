@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video & Audio Narration Studio</title>
+  <style>
+    :root {
+      --bg-primary: #0B0D0C;
+      --bg-secondary: #111613;
+      --bg-panel: #151A17;
+      --bg-elevated: #1C241F;
+      --accent-primary: #16A34A;
+      --accent-hover: #15803D;
+      --accent-bright: #4ADE80;
+      --text-primary: #F5F7F5;
+      --text-secondary: #A7B1AA;
+      --border-color: #29312C;
+      --border-focus: #16A34A;
+      --error-bg: #1C1313;
+      --error-border: #7F1D1D;
+      --error-text: #F87171;
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .app-header {
+      background-color: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      background: rgba(22, 163, 74, 0.12);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-bright);
+    }
+
+    .brand-text h1 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-subtitle {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .brand-badge {
+      background: rgba(22, 163, 74, 0.15);
+      color: var(--accent-bright);
+      border: 1px solid rgba(74, 222, 128, 0.25);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .header-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      background-color: var(--bg-panel);
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border-color);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--accent-bright);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-bright);
+    }
+
+    /* Main Container & Studio Layout */
+    .studio-container {
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px;
+      flex: 1;
+    }
+
+    .studio-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    @media (min-width: 1024px) {
+      .studio-grid {
+        grid-template-columns: 500px 1fr;
+      }
+    }
+
+    /* Card styling */
+    .card {
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-title-text {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title-icon {
+      color: var(--accent-bright);
+      display: flex;
+      align-items: center;
+    }
+
+    .badge {
+      background-color: var(--bg-elevated);
+      color: var(--accent-bright);
+      border: 1px solid var(--border-color);
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-weight: 600;
+    }
+
+    label {
+      display: block;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    textarea, input, select {
+      width: 100%;
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text-primary);
+      font-size: 13.5px;
+      box-sizing: border-box;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    textarea:focus, input:focus, select:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2);
+    }
+
+    textarea {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      resize: vertical;
+      min-height: 240px;
+      line-height: 1.6;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    @media (min-width: 640px) {
+      .row {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background-color: var(--accent-primary);
+      color: #FFFFFF;
+      text-decoration: none;
+      padding: 11px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+
+    .btn:hover:not(:disabled) {
+      background-color: var(--accent-hover);
+    }
+
+    .btn:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background-color: var(--bg-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background-color: #242E28;
+      border-color: var(--accent-primary);
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px;
+      border-radius: 6px;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .script-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    /* Progress Box */
+    .progress-box {
+      margin-top: 18px;
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 14px;
+      display: none;
+    }
+
+    .progress-track {
+      background-color: var(--bg-primary);
+      border-radius: 9999px;
+      height: 8px;
+      overflow: hidden;
+      margin-top: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .progress-bar {
+      background: linear-gradient(90deg, var(--accent-primary), var(--accent-bright));
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease;
+      border-radius: 9999px;
+    }
+
+    .progress-label {
+      font-size: 12.5px;
+      color: var(--accent-bright);
+      font-weight: 600;
+    }
+
+    /* Segment list */
+    .segments-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .segments-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .segment-item {
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+    }
+
+    .segment-item:hover {
+      border-color: var(--accent-primary);
+      background-color: var(--bg-elevated);
+    }
+
+    .segment-item.active {
+      border-color: var(--accent-bright);
+      background-color: rgba(22, 163, 74, 0.08);
+    }
+
+    .seg-time {
+      color: var(--accent-bright);
+      font-weight: 700;
+      font-size: 12px;
+      background-color: var(--bg-elevated);
+      border: 1px solid var(--border-color);
+      padding: 4px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+      margin-top: 2px;
+      font-family: ui-monospace, SFMono-Regular, monospace;
+      cursor: pointer;
+    }
+
+    .seg-time:hover {
+      border-color: var(--accent-primary);
+      background-color: var(--bg-secondary);
+    }
+
+    .seg-content {
+      flex: 1;
+    }
+
+    .seg-text {
+      font-size: 13.5px;
+      line-height: 1.5;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    video, audio {
+      width: 100%;
+      border-radius: 8px;
+      outline: none;
+      margin-top: 6px;
+      background-color: var(--bg-primary);
+    }
+
+    video {
+      border: 1px solid var(--border-color);
+      max-height: 480px;
+      object-fit: contain;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Footer */
+    .app-footer {
+      background-color: var(--bg-secondary);
+      border-top: 1px solid var(--border-color);
+      padding: 18px 28px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 32px;
+    }
+
+    .author-highlight {
+      color: var(--accent-bright);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header class="app-header">
+    <div class="brand-title">
+      <div class="brand-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+      </div>
+      <div class="brand-text">
+        <h1>
+          Narration Studio
+          <span class="brand-badge">Emerald Studio</span>
+        </h1>
+        <div class="brand-subtitle">Synchronized Text-to-Speech & Video Audio Multiplexing</div>
+      </div>
+    </div>
+    <div class="header-status">
+      <div class="status-dot"></div>
+      <span>Engine Ready</span>
+    </div>
+  </header>
+
+  <!-- Studio Main Container -->
+  <main class="studio-container">
+    <div class="studio-grid">
+      
+      <!-- Left Column: Controls & Script Input -->
+      <div class="left-panel">
+        
+        <!-- Script-to-Voice Card -->
+        <div class="card" style="border-color: var(--border-color);">
+          <div class="card-title">
+            <div class="card-title-text">
+              <span class="card-title-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+              </span>
+              <span>Voiceover Script & Cues</span>
+            </div>
+            <span class="badge">Timestamped Editor</span>
+          </div>
+
+          <label for="scriptText">Voiceover Script with Timestamps</label>
+          <textarea id="scriptText" placeholder="Paste your timestamped script here, for example:&#10;&#10;0:00 – 0:06&#10;Welcome to DogfoodHack. An organizer signs in and submits a new event proposal.&#10;&#10;0:06 – 0:12&#10;The Platform Admin reviews the proposal and approves it."></textarea>
+          
+          <div class="script-actions">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="loadSampleScript()">📋 Load 19-Part Sample Script</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="clearScript()">✕ Clear</button>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="voiceSelect">Narrator Voice</label>
+              <select id="voiceSelect" onchange="toggleVoiceOptions()">
+                <optgroup label="Free High-Definition Neural Voices (No Key Needed)">
+                  <option value="en-US-GuyNeural" selected>Guy (US Male - Natural & Engaging)</option>
+                  <option value="en-US-ChristopherNeural">Christopher (US Male - Clear & Crisp)</option>
+                  <option value="en-GB-RyanNeural">Ryan (British Male - Smooth Narrator)</option>
+                  <option value="en-US-JennyNeural">Jenny (US Female - Warm & Expressive)</option>
+                  <option value="en-GB-SoniaNeural">Sonia (British Female - Professional)</option>
+                  <option value="en-AU-WilliamNeural">William (Australian Male)</option>
+                </optgroup>
+                <optgroup label="ElevenLabs">
+                  <option value="elevenlabs">ElevenLabs (Custom Voice ID & API Key)</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <div>
+              <label for="videoPath">Source Video Path (Optional)</label>
+              <input type="text" id="videoPath" value="C:\Users\Lenovo\Downloads\Untitled design (1).mp4" placeholder="e.g. C:\Users\...\video.mp4">
+            </div>
+          </div>
+
+          <!-- ElevenLabs Options (Hidden by default) -->
+          <div id="elevenlabsBox" class="row hidden" style="margin-top: 12px; padding: 14px; background: var(--bg-secondary); border-radius: 8px; border: 1px solid var(--border-color);">
+            <div>
+              <label for="elApiKey">ElevenLabs API Key</label>
+              <input type="password" id="elApiKey" placeholder="sk_...">
+            </div>
+            <div>
+              <label for="elVoiceId">ElevenLabs Voice ID</label>
+              <input type="text" id="elVoiceId" placeholder="e.g. IKne3meq5aSn9XLyUdCD">
+            </div>
+          </div>
+
+          <!-- Generate Button & Progress -->
+          <div style="margin-top: 20px;">
+            <button id="generateBtn" class="btn" onclick="startGeneration()" style="width: 100%;">
+              🎙️ Convert Script to Voice & Sync Video
+            </button>
+          </div>
+
+          <div id="progressBox" class="progress-box">
+            <div id="progressLabel" class="progress-label">Starting...</div>
+            <div class="progress-track">
+              <div id="progressBar" class="progress-bar"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Video Deck & Output Segment Cards -->
+      <div class="right-panel">
+        
+        <!-- Video Preview Output Card -->
+        <div class="card" id="videoCard">
+          <div class="card-title">
+            <div class="card-title-text">
+              <span class="card-title-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+              </span>
+              <span>Edited Video Preview</span>
+            </div>
+            <span class="badge" id="videoBadge">1080p MP4</span>
+          </div>
+          <video id="mainVideoPlayer" controls src="DogfoodHack_Demo_Walkthrough.mp4"></video>
+          <div class="btn-group">
+            <a id="videoDownloadBtn" href="DogfoodHack_Demo_Walkthrough.mp4" download="DogfoodHack_Demo_Walkthrough.mp4" class="btn">
+              ⬇️ Download Video (.mp4)
+            </a>
+            <a id="audioDownloadBtn" href="dogfoodhack_voiceover_master.wav" download="dogfoodhack_voiceover_master.wav" class="btn btn-secondary">
+              ⬇️ Download Master Audio (.wav)
+            </a>
+          </div>
+        </div>
+
+        <!-- Master Audio Output Card -->
+        <div class="card" id="audioCard">
+          <div class="card-title">
+            <div class="card-title-text">
+              <span class="card-title-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+              </span>
+              <span>Standalone Master Audio Track</span>
+            </div>
+            <span class="badge" style="background: var(--bg-elevated);">44.1kHz Stereo WAV</span>
+          </div>
+          <audio id="mainAudioPlayer" controls src="dogfoodhack_voiceover_master.wav"></audio>
+        </div>
+
+        <!-- Timeline Segment Cues -->
+        <div class="segments-header">
+          <div class="segments-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            <span>Timeline Cues & Voice Clips</span>
+          </div>
+        </div>
+        <div id="segmentsContainer">
+          <!-- Populated dynamically via JS -->
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <p>© 2026 Narration Studio • Made by <span class="author-highlight">kryPsis</span></p>
+  </footer>
+
+  <script>
+    const SAMPLE_SCRIPT = `0:00 – 0:06
+Welcome to DogfoodHack. An organizer signs in and submits a new event proposal, VIBEATHON.
+
+0:06 – 0:12
+The Platform Admin reviews the proposal and approves or rejects it, with an optional reason.
+
+0:12 – 0:17
+The organizer then sets visibility, deadline, time zone, team size, and track mode.
+
+0:17 – 0:24
+Judges are invited by email. The roster shows each status, with options to confirm or revoke.
+
+0:24 – 0:33
+Approved events appear on the public home page, filterable by open, upcoming, or closed, with search and each event's deadline.
+
+0:33 – 0:40
+Participants sign in, open the event page with its overview, tracks, and prizes, and create a team by naming it.
+
+0:40 – 0:48
+The submission form covers basics, details and links, plus an optional thumbnail in JPEG, PNG, or WebP, under five megabytes.
+
+0:48 – 0:56
+Team owners can generate invitation links with a usage limit and expiry. Work saves as a draft or submits as final.
+
+0:56 – 1:10
+Every participant signs in with individual credentials, creates a team, and completes the same form, so each project is recorded before the deadline.
+
+1:10 – 1:30
+The same steps repeat across the platform, with each participant signing in separately, until all ten projects are submitted.
+
+1:31 – 1:43
+The organizer creates a judging round and rubric, then previews and commits the plan: ten projects, five judges, twenty assignments. Telemetry, stage closure, and exports become available.
+
+1:43 – 1:55
+Judges review their assigned projects, with details beside a rubric form, where a slider scores User Experience from zero to five.
+
+1:55 – 2:06
+Written feedback can be added. Reviews can be saved as drafts or finalized with Submit Review, and each judge repeats this for every assignment.
+
+2:06 – 2:16
+Each judge signs in with their own account and completes four reviews, so every project receives independent scores.
+
+2:16 – 2:25
+The judging dashboard shows the open round, completed reviews out of the total, and each submitted assignment with its score.
+
+2:25 – 2:44
+Further judges follow the same process. Each project in this demonstration is evaluated by two judges, and every review stays linked to its assignment.
+
+2:44 – 2:49
+Finally, the organizer signs in to review the outcome.
+
+2:49 – 2:55
+The status is valid and calibrated, with bias offsets calculated across twenty reviews.
+
+2:55 – 3:00
+Projects rank by normalized score, then the stage is finalized and published.`;
+
+    function loadSampleScript() {
+      document.getElementById('scriptText').value = SAMPLE_SCRIPT;
+      parseAndDisplaySampleSegments();
+    }
+
+    function clearScript() {
+      document.getElementById('scriptText').value = '';
+    }
+
+    function toggleVoiceOptions() {
+      const select = document.getElementById('voiceSelect');
+      const elBox = document.getElementById('elevenlabsBox');
+      if (select.value === 'elevenlabs') {
+        elBox.classList.remove('hidden');
+      } else {
+        elBox.classList.add('hidden');
+      }
+    }
+
+    function parseTimeToSeconds(timeStr) {
+      if (!timeStr) return 0;
+      const parts = timeStr.trim().split(':');
+      if (parts.length === 2) {
+        return parseInt(parts[0], 10) * 60 + parseFloat(parts[1]);
+      }
+      return 0;
+    }
+
+    function renderSegments(segments) {
+      const container = document.getElementById('segmentsContainer');
+      container.innerHTML = '';
+      segments.forEach((seg, index) => {
+        const item = document.createElement('div');
+        item.className = 'segment-item';
+        item.dataset.start = seg.start || parseTimeToSeconds(seg.label ? seg.label.split('–')[0] : '0:00');
+        item.innerHTML = `
+          <div class="seg-time" onclick="seekVideoTo(${item.dataset.start})">${seg.label}</div>
+          <div class="seg-content">
+            <div class="seg-text">"${seg.text}"</div>
+            <audio controls src="${seg.clip_url}${seg.clip_url.includes('?') ? '&' : '?'}t=${Date.now()}"></audio>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function seekVideoTo(seconds) {
+      const videoPlayer = document.getElementById('mainVideoPlayer');
+      if (videoPlayer) {
+        videoPlayer.currentTime = seconds;
+        videoPlayer.play().catch(() => {});
+      }
+    }
+
+    function parseAndDisplaySampleSegments() {
+      const text = SAMPLE_SCRIPT;
+      const blocks = text.split(/\n\s*\n/);
+      const segments = [];
+      let id = 1;
+      blocks.forEach(block => {
+        const lines = block.trim().split('\n');
+        if (lines.length >= 2) {
+          const label = lines[0].trim();
+          const clipText = lines.slice(1).join(' ').trim();
+          const startStr = label.split('–')[0].trim();
+          segments.push({
+            id: id,
+            label: label,
+            start: parseTimeToSeconds(startStr),
+            text: clipText,
+            clip_url: `/clips/clip_${String(id).padStart(2, '0')}.mp3`
+          });
+          id++;
+        }
+      });
+      renderSegments(segments);
+    }
+
+    async function startGeneration() {
+      const scriptText = document.getElementById('scriptText').value.trim();
+      if (!scriptText) {
+        alert('Please enter or paste a timestamped voiceover script.');
+        return;
+      }
+
+      const voiceSelect = document.getElementById('voiceSelect').value;
+      const isElevenLabs = voiceSelect === 'elevenlabs';
+      const elKey = isElevenLabs ? document.getElementById('elApiKey').value.trim() : null;
+      const elVoice = isElevenLabs ? document.getElementById('elVoiceId').value.trim() : null;
+      const videoPath = document.getElementById('videoPath').value.trim();
+
+      const btn = document.getElementById('generateBtn');
+      const progressBox = document.getElementById('progressBox');
+      const progressBar = document.getElementById('progressBar');
+      const progressLabel = document.getElementById('progressLabel');
+
+      btn.disabled = true;
+      btn.innerText = '⏳ Processing Voiceover & Video...';
+      progressBox.style.display = 'block';
+      progressBar.style.width = '10%';
+      progressLabel.innerText = 'Connecting to generation engine...';
+
+      // Poll progress in background
+      const progressTimer = setInterval(async () => {
+        try {
+          const res = await fetch('/api/progress');
+          const data = await res.json();
+          if (data && data.status) {
+            progressLabel.innerText = data.status;
+            progressBar.style.width = Math.max(10, Math.round(data.progress * 100)) + '%';
+          }
+        } catch(e) {}
+      }, 700);
+
+      try {
+        const response = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            script_text: scriptText,
+            voice: isElevenLabs ? null : voiceSelect,
+            elevenlabs_key: elKey,
+            elevenlabs_voice_id: elVoice,
+            video_path: videoPath || null
+          })
+        });
+
+        clearInterval(progressTimer);
+
+        if (!response.ok) {
+          const errData = await response.json();
+          throw new Error(errData.detail || 'Generation failed.');
+        }
+
+        const data = await response.json();
+        progressBar.style.width = '100%';
+        progressLabel.innerText = 'Complete! Video & audio updated successfully.';
+
+        // Update main players
+        const videoPlayer = document.getElementById('mainVideoPlayer');
+        const audioPlayer = document.getElementById('mainAudioPlayer');
+        const vBtn = document.getElementById('videoDownloadBtn');
+        const aBtn = document.getElementById('audioDownloadBtn');
+
+        const timestamp = Date.now();
+        if (data.video_url) {
+          videoPlayer.src = data.video_url + '?t=' + timestamp;
+          vBtn.href = data.video_url + '?t=' + timestamp;
+          videoPlayer.load();
+        }
+
+        if (data.master_audio_url) {
+          audioPlayer.src = data.master_audio_url + '?t=' + timestamp;
+          aBtn.href = data.master_audio_url + '?t=' + timestamp;
+          audioPlayer.load();
+        }
+
+        // Render segment cue list
+        if (data.segments) {
+          renderSegments(data.segments);
+        }
+
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.innerText = '🎙️ Convert Script to Voice & Sync Video';
+        }, 1500);
+
+      } catch (err) {
+        clearInterval(progressTimer);
+        btn.disabled = false;
+        btn.innerText = '🎙️ Convert Script to Voice & Sync Video';
+        progressLabel.innerText = 'Error: ' + err.message;
+        alert('Error: ' + err.message);
+      }
+    }
+
+    // Initial load: populate with sample script and existing segments
+    window.addEventListener('DOMContentLoaded', () => {
+      loadSampleScript();
+
+      // Highlight active segment during video playback
+      const videoPlayer = document.getElementById('mainVideoPlayer');
+      if (videoPlayer) {
+        videoPlayer.addEventListener('timeupdate', () => {
+          const currTime = videoPlayer.currentTime;
+          const items = document.querySelectorAll('.segment-item');
+          items.forEach(item => {
+            const start = parseFloat(item.dataset.start || '0');
+            const nextItem = item.nextElementSibling;
+            const end = nextItem ? parseFloat(nextItem.dataset.start || '99999') : 99999;
+            if (currTime >= start && currTime < end) {
+              item.classList.add('active');
+            } else {
+              item.classList.remove('active');
+            }
+          });
+        });
+      }
+    });
+  </script>
+</body>
+</html>
