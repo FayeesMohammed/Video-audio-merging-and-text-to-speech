@@ -62,6 +62,9 @@ async def process_script(
 ) -> Dict[str, Any]:
     os.makedirs(CLIPS_DIR, exist_ok=True)
 
+    if video_path:
+        video_path = video_path.strip().strip('"').strip("'")
+
     if not segments:
         raise ValueError("No segments provided")
 
@@ -191,6 +194,10 @@ async def process_script(
         res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         if res.returncode == 0:
             video_url = "/DogfoodHack_Demo_Walkthrough.mp4"
+        else:
+            raise RuntimeError(f"FFmpeg video merge failed: {res.stderr}")
+    elif video_path:
+        raise FileNotFoundError(f"Source video file not found: {video_path}")
 
     if progress_callback:
         progress_callback("Completed!", 1.0)

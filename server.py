@@ -3,7 +3,7 @@ import sys
 import asyncio
 import webbrowser
 from typing import Optional, Dict, Any
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, File, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -37,6 +37,25 @@ async def get_index():
 async def get_progress():
     return current_progress
 
+@app.post("/api/upload-video")
+async def upload_video(file: UploadFile = File(...)):
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="No file provided")
+    safe_name = "uploaded_source_" + os.path.basename(file.filename).replace(" ", "_")
+    upload_path = os.path.join(BASE_DIR, safe_name)
+    try:
+        with open(upload_path, "wb") as f:
+            while chunk := await file.read(1024 * 1024):
+                f.write(chunk)
+        return {
+            "success": True,
+            "file_path": upload_path,
+            "filename": file.filename,
+            "url": f"/{safe_name}"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to upload video: {str(e)}")
+
 @app.post("/api/generate")
 async def generate_voiceover(req: GenerateRequest):
     global current_progress
@@ -50,6 +69,13 @@ async def generate_voiceover(req: GenerateRequest):
             detail="Could not detect any timestamped segments. Please format like: '0:00 – 0:06 Your text here'"
         )
 
+    video_path = req.video_path.strip().strip('"').strip("'") if req.video_path else None
+    if video_path and not os.path.exists(video_path):
+        raise HTTPException(
+            status_code=400,
+            detail=f"Video file not found at: {video_path}. Please check that the file path is correct."
+        )
+
     def on_progress(msg: str, pct: float):
         global current_progress
         current_progress = {"status": msg, "progress": round(pct, 2)}
@@ -61,7 +87,7 @@ async def generate_voiceover(req: GenerateRequest):
             voice=req.voice or "en-US-GuyNeural",
             elevenlabs_key=req.elevenlabs_key.strip() if req.elevenlabs_key else None,
             elevenlabs_voice_id=req.elevenlabs_voice_id.strip() if req.elevenlabs_voice_id else None,
-            video_path=req.video_path.strip() if req.video_path else None,
+            video_path=video_path,
             progress_callback=on_progress
         )
         current_progress = {"status": "Ready", "progress": 1.0}

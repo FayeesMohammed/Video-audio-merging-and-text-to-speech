@@ -1,0 +1,14 @@
+# Media files
+*.mp4
+*.wav
+*.mp3
+clips/
+voice_samples/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# OS artifacts
+.DS_Store
+Thumbs.db

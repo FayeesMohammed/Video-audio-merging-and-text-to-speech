@@ -1,3 +1,6 @@
-edge-tts>=6.1.19
+edge-tts>=7.3.1
 miniaudio>=1.61
 imageio-ffmpeg>=0.6.0
+fastapi>=0.100.0
+uvicorn>=0.23.0
+pydantic>=2.0.0
