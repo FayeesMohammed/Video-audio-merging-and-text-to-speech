@@ -19,8 +19,8 @@ A commercial-grade, browser-based media production workstation and FastAPI backe
   - **Direct Filesystem Path:** Auto-sanitized path input that strips outer quotes and special characters from pasted paths.
 - **Timestamped Voiceover Script Editor:**
   - Multi-line textarea for editing timestamped narrations (`0:00 – 0:06`).
-  - Preloaded with a 19-part demo script matching the included demo video.
-  - One-click script loader and clearing actions.
+  - Formatted placeholder hints for effortless script formatting.
+  - One-click script clearing and instant timeline updates.
 - **Dual Voice Synthesis Engine:**
   - **Free Microsoft Edge Neural Voices:** 6 natural neural voices (Guy, Christopher, Ryan, Jenny, Sonia, William) with zero API keys or rate limits.
   - **ElevenLabs API Integration:** Custom Voice ID and API key configuration drawer.
@@ -66,10 +66,6 @@ A commercial-grade, browser-based media production workstation and FastAPI backe
 
 ```
 Video-audio-merging-and-text-to-speech/
-├── DogfoodHack_Demo_Walkthrough.mp4     # Merged 1080p master video output
-├── dogfoodhack_voiceover_master.wav     # Master audio timeline (44.1kHz Stereo WAV)
-├── clips/                              # Directory containing individual synthesized MP3 cues
-│   ├── clip_01.mp3 ... clip_19.mp3     # 19 synthesized narration clips
 ├── fonts/                              # Local font assets
 │   ├── Retro Floral.ttf                # Brand display typography font
 │   └── Retro Floral.otf
@@ -119,13 +115,13 @@ The parser automatically detects timestamps formatted as `MM:SS – MM:SS` or `M
 
 ```text
 0:00 – 0:06
-Welcome to DogfoodHack. An organizer signs in and submits a new event proposal.
+Welcome to our product showcase. An organizer signs in and submits a new proposal.
 
 0:06 – 0:12
-The Platform Admin reviews the proposal and approves it.
+The platform administrator reviews the submission and approves it.
 
 0:12 – 0:17
-The organizer then sets visibility, deadline, time zone, team size, and track mode.
+The team configures event visibility, timeline deadlines, and track categories.
 ```
 
 - **Silence & Padding:** If the audio duration is shorter than the allotted time slot, the pipeline automatically inserts silence up to the next timestamp.

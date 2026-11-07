@@ -90,10 +90,10 @@ def parse_script_text(raw_text: str) -> List[Dict[str, Any]]:
 if __name__ == "__main__":
     sample = """
     0:00 – 0:06
-    Welcome to DogfoodHack. An organizer signs in and submits a new event proposal, VIBEATHON.
+    Welcome to our product showcase. An organizer signs in and submits a new proposal.
 
     [0:06 - 0:12]
-    "The Platform Admin reviews the proposal and approves or rejects it."
+    "The platform administrator reviews the proposal and approves it."
     """
     res = parse_script_text(sample)
     print("Parsed count:", len(res))

@@ -1227,7 +1227,7 @@
           <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
         </svg>
         <span>Production Monitor</span>
-        <span class="nav-tab-badge" id="tabCueBadge">19 Cues</span>
+        <span class="nav-tab-badge" id="tabCueBadge">0 Cues</span>
       </button>
     </nav>
 
@@ -1348,11 +1348,10 @@
           </div>
 
           <label for="scriptText">Voiceover Script with Timestamps</label>
-          <textarea id="scriptText" placeholder="Paste your timestamped script here, for example:&#10;&#10;0:00 – 0:06&#10;Welcome to DogfoodHack. An organizer signs in and submits a new event proposal.&#10;&#10;0:06 – 0:12&#10;The Platform Admin reviews the proposal and approves it."></textarea>
+          <textarea id="scriptText" placeholder="Paste your timestamped script here, for example:&#10;&#10;0:00 – 0:06&#10;Welcome to our product showcase. An organizer signs in and submits a new proposal.&#10;&#10;0:06 – 0:12&#10;The platform administrator reviews the submission and approves it."></textarea>
           
           <div style="display:flex; gap:8px; margin-top:8px;">
-            <button type="button" class="btn btn-secondary btn-sm" onclick="loadSampleScript()">📋 Load 19-Part Sample Script</button>
-            <button type="button" class="btn btn-secondary btn-sm" onclick="clearScript()">✕ Clear</button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="clearScript()">✕ Clear Script</button>
           </div>
 
           <div style="margin-top: 16px;">
@@ -1536,7 +1535,7 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2.2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
             <span>T1: Speech Sync & Multi-Track Narration Cues</span>
           </div>
-          <span class="badge badge-mint" id="timelineCueCount">19 Cues Synced</span>
+          <span class="badge badge-mint" id="timelineCueCount">0 Cues Synced</span>
         </div>
 
         <div id="segmentsContainer" class="timeline-cues-scroll">
@@ -1556,64 +1555,7 @@
   <div id="toastContainer" class="toast-container"></div>
 
   <script>
-    const SAMPLE_SCRIPT = `0:00 – 0:06
-Welcome to DogfoodHack. An organizer signs in and submits a new event proposal, VIBEATHON.
-
-0:06 – 0:12
-The Platform Admin reviews the proposal and approves or rejects it, with an optional reason.
-
-0:12 – 0:17
-The organizer then sets visibility, deadline, time zone, team size, and track mode.
-
-0:17 – 0:24
-Judges are invited by email. The roster shows each status, with options to confirm or revoke.
-
-0:24 – 0:33
-Approved events appear on the public home page, filterable by open, upcoming, or closed, with search and each event's deadline.
-
-0:33 – 0:40
-Participants sign in, open the event page with its overview, tracks, and prizes, and create a team by naming it.
-
-0:40 – 0:48
-The submission form covers basics, details and links, plus an optional thumbnail in JPEG, PNG, or WebP, under five megabytes.
-
-0:48 – 0:56
-Team owners can generate invitation links with a usage limit and expiry. Work saves as a draft or submits as final.
-
-0:56 – 1:10
-Every participant signs in with individual credentials, creates a team, and completes the same form, so each project is recorded before the deadline.
-
-1:10 – 1:30
-The same steps repeat across the platform, with each participant signing in separately, until all ten projects are submitted.
-
-1:31 – 1:43
-The organizer creates a judging round and rubric, then previews and commits the plan: ten projects, five judges, twenty assignments. Telemetry, stage closure, and exports become available.
-
-1:43 – 1:55
-Judges review their assigned projects, with details beside a rubric form, where a slider scores User Experience from zero to five.
-
-1:55 – 2:06
-Written feedback can be added. Reviews can be saved as drafts or finalized with Submit Review, and each judge repeats this for every assignment.
-
-2:06 – 2:16
-Each judge signs in with their own account and completes four reviews, so every project receives independent scores.
-
-2:16 – 2:25
-The judging dashboard shows the open round, completed reviews out of the total, and each submitted assignment with its score.
-
-2:25 – 2:44
-Further judges follow the same process. Each project in this demonstration is evaluated by two judges, and every review stays linked to its assignment.
-
-2:44 – 2:49
-Finally, the organizer signs in to review the outcome.
-
-2:49 – 2:55
-The status is valid and calibrated, with bias offsets calculated across twenty reviews.
-
-2:55 – 3:00
-Projects rank by normalized score, then the stage is finalized and published.`;
-
-    // Page Switching (Studio <-> Production Monitor)
+// Page Switching (Studio <-> Production Monitor)
     function switchStudioPage(pageName) {
       const pageStudio = document.getElementById('pageStudioView');
       const pageMonitor = document.getElementById('pageMonitorView');
@@ -1768,8 +1710,8 @@ Projects rank by normalized score, then the stage is finalized and published.`;
 
     // Reset Session
     function resetWorkstationSession() {
-      if (confirm('Reset current workstation session? This will reload the default script and return to the Studio console.')) {
-        loadSampleScript();
+      if (confirm('Reset current workstation session? This will clear all inputs and return to the Studio console.')) {
+        clearScript();
         document.getElementById('videoPath').value = '';
         updateVideoPreviewState();
         const progressBox = document.getElementById('progressBox');
@@ -1782,12 +1724,12 @@ Projects rank by normalized score, then the stage is finalized and published.`;
     }
 
     function loadSampleScript() {
-      document.getElementById('scriptText').value = SAMPLE_SCRIPT;
-      parseAndDisplaySampleSegments();
+      clearScript();
     }
 
     function clearScript() {
       document.getElementById('scriptText').value = '';
+      renderSegments([]);
     }
 
     function toggleVoiceOptions() {
@@ -1897,33 +1839,7 @@ Projects rank by normalized score, then the stage is finalized and published.`;
     }
 
     function parseAndDisplaySampleSegments() {
-      const text = SAMPLE_SCRIPT;
-      const blocks = text.split(/\n\s*\n/);
-      const segments = [];
-      let id = 1;
-      blocks.forEach(block => {
-        const lines = block.trim().split('\n');
-        if (lines.length >= 2) {
-          const label = lines[0].trim();
-          const clipText = lines.slice(1).join(' ').trim();
-          const startStr = label.split('–')[0].trim();
-          const endStr = label.includes('–') ? label.split('–')[1].trim() : '';
-          const startSec = parseTimeToSeconds(startStr);
-          const endSec = parseTimeToSeconds(endStr);
-          const dur = (endSec > startSec) ? (endSec - startSec - 0.6) : 5.0;
-          segments.push({
-            id: id,
-            label: label,
-            start: startSec,
-            end: endSec,
-            duration: Math.max(1.0, dur),
-            text: clipText,
-            clip_url: `/clips/clip_${String(id).padStart(2, '0')}.mp3`
-          });
-          id++;
-        }
-      });
-      renderSegments(segments);
+      renderSegments([]);
     }
 
     // Interactive Waveform Visualizer
@@ -2201,7 +2117,7 @@ Projects rank by normalized score, then the stage is finalized and published.`;
 
     // Initial load
     window.addEventListener('DOMContentLoaded', () => {
-      loadSampleScript();
+      renderSegments([]);
       setupDragAndDrop();
       updateVideoPreviewState();
       initWaveformVisualizer();

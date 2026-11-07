@@ -15,7 +15,7 @@ BYTES_PER_FRAME = 4
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CLIPS_DIR = os.path.join(BASE_DIR, "clips")
-DEFAULT_VIDEO = r"C:\Users\Lenovo\Downloads\Untitled design (1).mp4"
+DEFAULT_VIDEO = None
 
 async def synthesize_elevenlabs(text: str, voice_id: str, api_key: str) -> bytes:
     url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}?output_format=pcm_44100"
@@ -160,7 +160,7 @@ async def process_script(
     if progress_callback:
         progress_callback("Stitching master audio timeline...", 0.8)
 
-    master_wav_path = os.path.join(BASE_DIR, "dogfoodhack_voiceover_master.wav")
+    master_wav_path = os.path.join(BASE_DIR, "master_voiceover.wav")
     with wave.open(master_wav_path, "wb") as wf:
         wf.setnchannels(CHANNELS)
         wf.setsampwidth(2)
@@ -168,10 +168,10 @@ async def process_script(
         wf.writeframes(bytes(master_buffer))
 
     video_url = None
-    merged_video_path = os.path.join(BASE_DIR, "DogfoodHack_Demo_Walkthrough.mp4")
+    merged_video_path = os.path.join(BASE_DIR, "master_video_output.mp4")
 
-    # If video path provided or default video exists
-    chosen_video = video_path if (video_path and os.path.exists(video_path)) else (DEFAULT_VIDEO if os.path.exists(DEFAULT_VIDEO) else None)
+    # If video path provided
+    chosen_video = video_path if (video_path and os.path.exists(video_path)) else None
     
     if chosen_video:
         if progress_callback:
@@ -193,7 +193,7 @@ async def process_script(
         ]
         res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         if res.returncode == 0:
-            video_url = "/DogfoodHack_Demo_Walkthrough.mp4"
+            video_url = "/master_video_output.mp4"
         else:
             raise RuntimeError(f"FFmpeg video merge failed: {res.stderr}")
     elif video_path:
@@ -206,6 +206,6 @@ async def process_script(
         "success": True,
         "total_duration": round(total_timeline_sec, 2),
         "segments": results,
-        "master_audio_url": "/dogfoodhack_voiceover_master.wav",
+        "master_audio_url": "/master_voiceover.wav",
         "video_url": video_url
     }
